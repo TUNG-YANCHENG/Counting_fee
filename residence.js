@@ -37,7 +37,6 @@ function setCheckOutDate(dateStr) {
 
 function selectRoom(roomType) {
   residenceState.selectedRoom = roomType;
-  residenceState.selectedPackage = null;
   renderResidenceCalculator();
 }
 
@@ -50,7 +49,6 @@ function setOccupancy(count) {
 
 function selectPackage(packageId) {
   residenceState.selectedPackage = packageId;
-  residenceState.selectedRoom = null; // 選擇加購行程時清除房型選擇
   renderResidenceCalculator();
 }
 
@@ -296,10 +294,25 @@ function renderResidenceRoomOptions() {
       `;
     }).join('');
 
-  container.innerHTML = `
-    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">房型選擇</h3>
-    <div class="equipment-grid">${roomsHtml}</div>
-  `;
+  let html = '';
+
+  // 如果已選擇房型，顯示清除按鈕
+  if (residenceState.selectedRoom) {
+    const room = ACCOMMODATION.rooms[residenceState.selectedRoom];
+    html += `
+      <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(0, 102, 204, 0.1); border-radius: 0.375rem; border-left: 3px solid var(--ocean);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 600;">✓ 已選擇: ${room.name}</div>
+          <button class="danger" onclick="selectRoom(null)" style="padding: 0.25rem 0.75rem;">清除房型</button>
+        </div>
+      </div>
+    `;
+  } else {
+    html += `<h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">房型選擇</h3>`;
+  }
+
+  html += `<div class="equipment-grid">${roomsHtml}</div>`;
+  container.innerHTML = html;
 }
 
 function renderResidencePackageOptions() {
@@ -325,10 +338,25 @@ function renderResidencePackageOptions() {
     `;
   }).join('');
 
-  container.innerHTML = `
-    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">加購行程</h3>
-    <div class="equipment-grid">${packagesHtml}</div>
-  `;
+  let html = '';
+
+  // 如果已選擇加購行程，顯示清除按鈕
+  if (residenceState.selectedPackage) {
+    const pkg = ACCOMMODATION.packages[residenceState.selectedPackage];
+    html += `
+      <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(0, 170, 136, 0.1); border-radius: 0.375rem; border-left: 3px solid var(--seafoam);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 600;">✓ 已選擇: ${pkg.name}</div>
+          <button class="danger" onclick="selectPackage(null)" style="padding: 0.25rem 0.75rem;">清除行程</button>
+        </div>
+      </div>
+    `;
+  } else {
+    html += `<h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">加購行程 (可選)</h3>`;
+  }
+
+  html += `<div class="equipment-grid">${packagesHtml}</div>`;
+  container.innerHTML = html;
 }
 
 function renderResidenceLineItems() {
@@ -350,14 +378,22 @@ function renderResidenceLineItems() {
     html += `<div style="margin-bottom: 1.5rem;">
       <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--slate);">${category}</h3>`;
 
-    categoryItems.forEach(item => {
+    categoryItems.forEach((item, idx) => {
+      const isCustom = item.isCustom || false;
+      const customIdx = isCustom ? residenceState.customItems.findIndex(c => c.name === item.label && c.amount === item.price) : -1;
+
       html += `
         <div class="line-item">
           <div class="item-description">
             <div class="item-label">${item.label}</div>
             ${item.calc ? `<div class="item-calc">${item.calc}</div>` : ''}
           </div>
-          <div class="item-price">${item.price}</div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div class="item-price" style="min-width: 100px;">${item.price}</div>
+            <input type="number" placeholder="改" style="width: 80px; padding: 0.4rem; border: 1px solid var(--border-light); border-radius: 0.25rem;"
+              onchange="updateResidenceItemOverride('${item.id}', this.value)">
+            ${isCustom ? `<button class="danger" onclick="removeResidenceCustomItem(${customIdx})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">刪除</button>` : ''}
+          </div>
         </div>
       `;
     });
@@ -403,6 +439,21 @@ function renderResidenceSummary() {
       <div class="per-person">平均每人: $${perPerson}</div>
     </div>
   `;
+}
+
+// ============ 覆寫和刪除 ============
+
+function updateResidenceItemOverride(itemId, value) {
+  // 暫時實現（可擴展）
+  if (value) {
+    showToast(`已更新: ${itemId}`);
+  }
+}
+
+function removeResidenceCustomItem(idx) {
+  residenceState.customItems.splice(idx, 1);
+  renderResidenceCalculator();
+  showToast('已刪除項目');
 }
 
 // ============ 儲存/載入 ============
