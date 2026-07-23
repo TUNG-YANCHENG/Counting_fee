@@ -144,15 +144,11 @@ function comboSetOccupancy(count) {
 
 function comboSelectRoom(roomType) {
   comboState.selectedRoom = roomType;
-  comboState.selectedPackage = null;
   renderComboCalculator();
 }
 
 function comboSelectPackage(packageId) {
   comboState.selectedPackage = packageId;
-  if (packageId !== null) {
-    comboState.selectedRoom = null;
-  }
   renderComboCalculator();
 }
 
@@ -276,7 +272,7 @@ function comboCalculateResidenceCost() {
 
   const items = [];
 
-  // 房費
+  // 房費（可選）
   if (comboState.selectedRoom) {
     const roomCost = calculateRoomCost(
       comboState.selectedRoom,
@@ -300,7 +296,7 @@ function comboCalculateResidenceCost() {
     }
   }
 
-  // 加購行程
+  // 加購行程（可選，可與房費並存）
   if (comboState.selectedPackage) {
     const pkg = COMBO_ACCOMMODATION.packages[comboState.selectedPackage];
     let cost = pkg.price * comboState.occupancy;
@@ -318,6 +314,11 @@ function comboCalculateResidenceCost() {
         id: `residence-package-${comboState.selectedPackage}`
       });
     }
+  }
+
+  // 如果既沒選房型也沒選加購，顯示提示
+  if (!comboState.selectedRoom && !comboState.selectedPackage) {
+    // 空列表，費用部分會顯示空的民宿住宿類別
   }
 
   return items;
@@ -567,25 +568,18 @@ function renderComboResidenceSection() {
         `;
       }).join('');
 
-    if (comboState.selectedRoom) {
-      html += `
-        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 102, 204, 0.1); border-radius: 0.375rem; border-left: 3px solid var(--ocean);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-weight: 600;">已選擇房型</div>
-            <button class="danger" onclick="comboSelectRoom(null)" style="padding: 0.25rem 0.75rem;">清除選擇</button>
-          </div>
+    // 房型選擇（一直可見）
+    html += `
+      <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div class="section-title" style="margin: 0;">房型選擇</div>
+          ${comboState.selectedRoom ? `<button class="danger" onclick="comboSelectRoom(null)" style="padding: 0.25rem 0.75rem;">清除房型</button>` : ''}
         </div>
-      `;
-    } else {
-      html += `
-        <div style="margin-top: 1.5rem;">
-          <div class="section-title">房型選擇</div>
-          <div class="equipment-grid">${roomsHtml}</div>
-        </div>
-      `;
-    }
+        <div class="equipment-grid">${roomsHtml}</div>
+      </div>
+    `;
 
-    // 加購行程
+    // 加購行程（一直可見）
     const packageIds = Object.keys(COMBO_ACCOMMODATION.packages);
     const packagesHtml = packageIds.map(pkgId => {
       const pkg = COMBO_ACCOMMODATION.packages[pkgId];
@@ -605,23 +599,15 @@ function renderComboResidenceSection() {
       `;
     }).join('');
 
-    if (comboState.selectedPackage) {
-      html += `
-        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0, 170, 136, 0.1); border-radius: 0.375rem; border-left: 3px solid var(--seafoam);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-weight: 600;">已選擇加購行程</div>
-            <button class="danger" onclick="comboSelectPackage(null)" style="padding: 0.25rem 0.75rem;">清除選擇</button>
-          </div>
+    html += `
+      <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div class="section-title" style="margin: 0;">加購行程 (可選)</div>
+          ${comboState.selectedPackage ? `<button class="danger" onclick="comboSelectPackage(null)" style="padding: 0.25rem 0.75rem;">清除行程</button>` : ''}
         </div>
-      `;
-    } else {
-      html += `
-        <div style="margin-top: 1.5rem;">
-          <div class="section-title">加購行程</div>
-          <div class="equipment-grid">${packagesHtml}</div>
-        </div>
-      `;
-    }
+        <div class="equipment-grid">${packagesHtml}</div>
+      </div>
+    `;
   }
 
   container.innerHTML = html;
