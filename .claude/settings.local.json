@@ -13,7 +13,12 @@
       "Bash(git commit -m '新增詳細使用指南文檔 *)",
       "Bash(awk '{print \"  總行數: \" $1}')",
       "Bash(awk '{sum+=$5} END {printf \"  JS 檔案大小: %.1f KB\\\\n\", sum/1024}')",
-      "Bash(awk '{sum+=$5} END {printf \" HTML 檔案大小: %.1f KB\\\\n\", sum/1024}')"
+      "Bash(awk '{sum+=$5} END {printf \" HTML 檔案大小: %.1f KB\\\\n\", sum/1024}')",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(start index.html)",
+      "Bash(git commit -m '開發組合套裝、修復多項BUG、添加完整測試計畫 *)"
     ]
   }
 }

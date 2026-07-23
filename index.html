@@ -148,12 +148,25 @@
 
     <!-- =============== 組合套裝模式 =============== -->
     <div id="tab-combo" class="tab-content">
+      <!-- 潛水部分 -->
+      <div class="section" id="comboDivingSection"></div>
+
+      <!-- 民宿切換 -->
+      <div class="section" id="comboResidenceToggle"></div>
+
+      <!-- 民宿部分（條件顯示） -->
+      <div class="section" id="comboResidenceSection"></div>
+
+      <!-- 費用明細 -->
       <div class="section">
-        <div class="section-title">組合套裝計算（開發中）</div>
-        <p style="color: var(--text-secondary); padding: 1rem;">
-          將潛水遊和民宿住宿整合報價。<br>
-          先在各分頁計算，再匯總費用。
-        </p>
+        <div class="section-title">費用明細</div>
+        <div id="comboLineItems"></div>
+      </div>
+
+      <!-- 費用摘要 -->
+      <div class="section">
+        <div class="section-title">費用摘要</div>
+        <div id="comboSummary"></div>
       </div>
     </div>
 
@@ -172,6 +185,7 @@
   <script src="accommodation.js"></script>
   <script src="app.js"></script>
   <script src="residence.js"></script>
+  <script src="combo.js"></script>
   <script>
     // 標籤頁切換
     function switchTab(tabName) {
@@ -197,6 +211,11 @@
       // 如果是民宿模式，初始化民宿計算器
       if (tabName === 'residence') {
         initResidence();
+      }
+
+      // 如果是組合模式，初始化組合計算器
+      if (tabName === 'combo') {
+        initCombo();
       }
 
       // 儲存選中的標籤頁
