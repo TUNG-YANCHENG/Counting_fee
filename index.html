@@ -3,64 +3,261 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>潛水費用計算器</title>
+  <title>台東行程計算器</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--ocean);
+    }
+
+    .tab-btn.active {
+      color: var(--ocean);
+      border-bottom-color: var(--ocean);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>🤿 潛水費用計算器</h1>
-    <p class="subtitle">Fun Dive 與裝備租賃費用計算工具</p>
+    <h1>🏝️ 台東行程計算器</h1>
+    <p class="subtitle">潛水遊、民宿住宿、組合套裝 - 靈活報價工具</p>
 
-    <!-- 人員選擇區 -->
-    <div class="section">
-      <div class="section-title">潛水人員</div>
-      <div id="diverSelector"></div>
-      <div id="diverList"></div>
+    <!-- 標籤頁導航 -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('diving')">🤿 潛水遊</button>
+      <button class="tab-btn" onclick="switchTab('residence')">🏠 民宿住宿</button>
+      <button class="tab-btn" onclick="switchTab('combo')">✨ 組合套裝</button>
     </div>
 
-    <!-- 行程編輯區 -->
-    <div class="section">
-      <div class="section-title">行程規劃</div>
-      <div class="input-group">
-        <input type="text" id="dayInput" placeholder="例：9/25 (上午跳水、下午船潛x2)">
-        <button onclick="addDay()">新增一天</button>
+    <!-- =============== 潛水遊模式 =============== -->
+    <div id="tab-diving" class="tab-content active">
+      <!-- 人員選擇區 -->
+      <div class="section">
+        <div class="section-title">潛水人員</div>
+        <div id="diverSelector"></div>
+        <div id="diverList"></div>
       </div>
-      <div id="daysList"></div>
-    </div>
 
-    <!-- 裝備設定區 -->
-    <div class="section">
-      <div class="section-title">裝備租賃設定</div>
-      <div id="equipmentSection"></div>
-    </div>
+      <!-- 行程編輯區 -->
+      <div class="section">
+        <div class="section-title">行程規劃</div>
+        <div class="input-group">
+          <input type="text" id="dayInput" placeholder="例：9/25 (上午跳水、下午船潛x2)">
+          <button onclick="addDay()">新增一天</button>
+        </div>
+        <div id="daysList"></div>
+      </div>
 
-    <!-- 費用明細 -->
-    <div class="section">
-      <div class="section-title">費用明細</div>
-      <div id="lineItems"></div>
-    </div>
+      <!-- 裝備設定區 -->
+      <div class="section">
+        <div class="section-title">裝備租賃設定</div>
+        <div id="equipmentSection"></div>
+      </div>
 
-    <!-- 費用摘要 -->
-    <div class="section">
-      <div class="section-title">費用摘要</div>
-      <div id="summary"></div>
-      <div class="button-group">
-        <button class="copy-btn" onclick="copyQuote()">複製報價文本</button>
-        <button class="secondary" onclick="saveDraft()">儲存草稿</button>
-        <button class="admin-btn" onclick="window.location.href='admin.html'">⚙️ 後台管理</button>
+      <!-- 費用明細 -->
+      <div class="section">
+        <div class="section-title">費用明細</div>
+        <div id="lineItems"></div>
+      </div>
+
+      <!-- 費用摘要 -->
+      <div class="section">
+        <div class="section-title">費用摘要</div>
+        <div id="summary"></div>
+        <div class="button-group">
+          <button class="copy-btn" onclick="copyQuote()">複製報價文本</button>
+          <button class="secondary" onclick="saveDraft()">儲存草稿</button>
+        </div>
+      </div>
+
+      <!-- 草稿管理 -->
+      <div class="section">
+        <div class="section-title">已儲存草稿</div>
+        <div id="storageSection"></div>
       </div>
     </div>
 
-    <!-- 草稿管理 -->
-    <div class="section">
-      <div class="section-title">已儲存草稿</div>
-      <div id="storageSection"></div>
+    <!-- =============== 民宿住宿模式 =============== -->
+    <div id="tab-residence" class="tab-content">
+      <!-- 日期選擇 -->
+      <div class="section">
+        <div class="section-title">入住資訊</div>
+        <div id="residenceDateSelector"></div>
+      </div>
+
+      <!-- 人數選擇 -->
+      <div class="section">
+        <div class="section-title">入住人數</div>
+        <div id="residenceOccupancySelector"></div>
+      </div>
+
+      <!-- 房型選擇 -->
+      <div class="section">
+        <div id="residenceRoomOptions"></div>
+      </div>
+
+      <!-- 加購行程 -->
+      <div class="section">
+        <div id="residencePackageOptions"></div>
+      </div>
+
+      <!-- 費用明細 -->
+      <div class="section">
+        <div class="section-title">費用明細</div>
+        <div id="residenceLineItems"></div>
+      </div>
+
+      <!-- 費用摘要 -->
+      <div class="section">
+        <div class="section-title">費用摘要</div>
+        <div id="residenceSummary"></div>
+        <div class="button-group">
+          <button class="copy-btn" onclick="copyResidenceQuote()">複製報價文本</button>
+          <button class="secondary" onclick="saveResidenceDraft()">儲存草稿</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== 組合套裝模式 =============== -->
+    <div id="tab-combo" class="tab-content">
+      <div class="section">
+        <div class="section-title">組合套裝計算（開發中）</div>
+        <p style="color: var(--text-secondary); padding: 1rem;">
+          將潛水遊和民宿住宿整合報價。<br>
+          先在各分頁計算，再匯總費用。
+        </p>
+      </div>
+    </div>
+
+    <!-- 管理按鈕 -->
+    <div class="section" style="text-align: center;">
+      <div class="button-group" style="justify-content: center;">
+        <button class="admin-btn" onclick="window.location.href='admin.html'">⚙️ 潛水費用管理</button>
+        <button class="admin-btn" onclick="window.location.href='admin-residence.html'">🏠 民宿價格管理</button>
+      </div>
     </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script src="config.js"></script>
+  <script src="accommodation.js"></script>
   <script src="app.js"></script>
+  <script src="residence.js"></script>
+  <script>
+    // 標籤頁切換
+    function switchTab(tabName) {
+      // 隱藏所有標籤頁
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // 取消所有按鈕的活躍狀態
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // 顯示選中的標籤頁
+      const selectedTab = document.getElementById(`tab-${tabName}`);
+      if (selectedTab) {
+        selectedTab.classList.add('active');
+      }
+
+      // 設定按鈕為活躍
+      event.target.classList.add('active');
+
+      // 如果是民宿模式，初始化民宿計算器
+      if (tabName === 'residence') {
+        initResidence();
+      }
+
+      // 儲存選中的標籤頁
+      localStorage.setItem('selectedTab', tabName);
+    }
+
+    // 副本報價函數（民宿版）
+    function copyResidenceQuote() {
+      const items = generateResidenceLineItems();
+      const total = calculateResidenceTotal();
+      const participantCount = residenceState.occupancy || 1;
+      const perPerson = (total / participantCount).toFixed(0);
+
+      let text = '===== 民宿住宿報價 =====\n\n';
+
+      if (residenceState.checkInDate && residenceState.checkOutDate) {
+        const nights = calculateNightsBetween(residenceState.checkInDate, residenceState.checkOutDate);
+        text += `入住期間: ${residenceState.checkInDate} ~ ${residenceState.checkOutDate} (${nights}晚)\n`;
+        text += `入住人數: ${residenceState.occupancy}人\n\n`;
+      }
+
+      text += '費用明細:\n';
+      const itemsByCategory = {};
+      items.forEach(item => {
+        if (!itemsByCategory[item.category]) itemsByCategory[item.category] = [];
+        itemsByCategory[item.category].push(item);
+      });
+
+      Object.entries(itemsByCategory).forEach(([category, categoryItems]) => {
+        text += `${category}:\n`;
+        categoryItems.forEach(item => {
+          text += `  ${item.label} = $${item.price}\n`;
+        });
+      });
+
+      text += `\n合計: $${(total - residenceState.globalDiscount).toFixed(0)}\n`;
+      text += `平均每人: $${perPerson}\n`;
+      text += `總人數: ${participantCount}\n`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已複製到剪貼簿!');
+      });
+    }
+
+    // 民宿草稿儲存
+    function saveResidenceDraft() {
+      const name = prompt('輸入草稿名稱:');
+      if (!name) return;
+      const drafts = JSON.parse(localStorage.getItem('residenceDrafts') || '{}');
+      drafts[name] = JSON.stringify(residenceState);
+      localStorage.setItem('residenceDrafts', JSON.stringify(drafts));
+      showToast(`草稿 "${name}" 已儲存`);
+      initResidence();
+    }
+
+    // 頁面載入時恢復選中的標籤頁
+    window.addEventListener('load', () => {
+      const selectedTab = localStorage.getItem('selectedTab') || 'diving';
+      const tabBtn = document.querySelector(`[onclick="switchTab('${selectedTab}')"]`);
+      if (tabBtn) tabBtn.click();
+    });
+  </script>
 </body>
 </html>

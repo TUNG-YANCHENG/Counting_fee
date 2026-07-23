@@ -6,7 +6,14 @@
       "Bash(git init *)",
       "Bash(git config *)",
       "Bash(git add *)",
-      "Bash(git commit -m '初始化：潛水費用計算器 *)"
+      "Bash(git commit -m '初始化：潛水費用計算器 *)",
+      "Bash(grep -E \"\\\\.html$|\\\\.js$|\\\\.css$|\\\\.md$|\\\\.gitignore$\")",
+      "Bash(git commit -m '新增民宿預訂計算系統 *)",
+      "Bash(git commit -m '更新文檔：完整說明民宿系統整合 *)",
+      "Bash(git commit -m '新增詳細使用指南文檔 *)",
+      "Bash(awk '{print \"  總行數: \" $1}')",
+      "Bash(awk '{sum+=$5} END {printf \"  JS 檔案大小: %.1f KB\\\\n\", sum/1024}')",
+      "Bash(awk '{sum+=$5} END {printf \" HTML 檔案大小: %.1f KB\\\\n\", sum/1024}')"
     ]
   }
 }
