@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>潛水計算器 - 後台管理</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+
+    .admin-table thead {
+      background: var(--ocean);
+      color: white;
+    }
+
+    .admin-table th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border-light);
+    }
+
+    .admin-table td {
+      padding: 0.75rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .admin-table input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border-light);
+      border-radius: 0.25rem;
+    }
+
+    .admin-table tr:hover {
+      background: rgba(0, 102, 204, 0.05);
+    }
+
+    .table-section {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      border-left: 3px solid var(--ocean);
+      overflow-x: auto;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .table-section {
+        background: #111827;
+      }
+
+      .admin-table input {
+        background: #1F2937;
+        color: var(--text-primary);
+        border-color: #374151;
+      }
+    }
+
+    :root[data-theme="dark"] .table-section {
+      background: #111827;
+    }
+
+    :root[data-theme="dark"] .admin-table input {
+      background: #1F2937;
+      border-color: #374151;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .back-link {
+      color: var(--ocean);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: background 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(0, 102, 204, 0.1);
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="admin-header">
+      <h1>⚙️ 後台管理</h1>
+      <a class="back-link" href="index_new.html">← 返回計算器</a>
+    </div>
+
+    <!-- Fun Dive 價格表 -->
+    <div class="table-section">
+      <h2 style="margin-bottom: 0.75rem; font-size: 1.1rem;">Fun Dive 導潛價格</h2>
+      <p class="section-subtitle">依人數 × 潛水類型 (單位: 元/人)</p>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>人數</th>
+              <th>岸潛</th>
+              <th>船潛</th>
+              <th>夜潛</th>
+              <th>Check Dive</th>
+            </tr>
+          </thead>
+          <tbody id="funDiveTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 基礎費用 -->
+    <div class="table-section">
+      <h2 style="margin-bottom: 0.75rem; font-size: 1.1rem;">基礎費用</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">船潛登船費 (元/人)</label>
+          <input type="number" id="shipFee" onchange="updateBasicFee('shipFee', this.value)">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">跟潛體驗 (元/人)</label>
+          <input type="number" id="tagalong" onchange="updateBasicFee('tagalong', this.value)">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">水肺複習 (元/人)</label>
+          <input type="number" id="waterSkillReview" onchange="updateBasicFee('waterSkillReview', this.value)">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">高氧 (元/支)</label>
+          <input type="number" id="highOxygen" onchange="updateBasicFee('highOxygen', this.value)">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">配重保險費 (元/天)</label>
+          <input type="number" id="weightBeltInsurance" onchange="updateBasicFee('weightBeltInsurance', this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- 裝備租賃價格 -->
+    <div class="table-section">
+      <h2 style="margin-bottom: 0.75rem; font-size: 1.1rem;">裝備租賃價格</h2>
+      <p class="section-subtitle">單位: 元/天</p>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>裝備項目</th>
+              <th>半天價格</th>
+              <th>全天價格</th>
+            </tr>
+          </thead>
+          <tbody id="equipmentTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="table-section">
+      <div class="admin-actions">
+        <button class="copy-btn" onclick="exportPricing()">📊 匯出價格表 JSON</button>
+        <button class="secondary" onclick="resetToDefault()">🔄 重置為預設值</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="config.js"></script>
+  <script>
+    let adminPricing = getPricing();
+
+    function init() {
+      renderFunDiveTable();
+      renderEquipmentTable();
+      renderBasicFees();
+    }
+
+    function renderFunDiveTable() {
+      const tbody = document.getElementById('funDiveTable');
+      tbody.innerHTML = Object.entries(adminPricing.funDive).map(([people, prices]) => `
+        <tr>
+          <td><strong>${people}人</strong></td>
+          <td><input type="number" value="${prices.岸潛}" onchange="updateFunDive(${people}, '岸潛', this.value)"></td>
+          <td><input type="number" value="${prices.船潛}" onchange="updateFunDive(${people}, '船潛', this.value)"></td>
+          <td><input type="number" value="${prices.夜潛}" onchange="updateFunDive(${people}, '夜潛', this.value)"></td>
+          <td><input type="number" value="${prices.checkDive}" onchange="updateFunDive(${people}, 'checkDive', this.value)"></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderEquipmentTable() {
+      const tbody = document.getElementById('equipmentTable');
+      tbody.innerHTML = Object.entries(adminPricing.equipment).map(([item, prices]) => `
+        <tr>
+          <td><strong>${item}</strong></td>
+          <td><input type="number" value="${prices.halfDay || ''}" onchange="updateEquipment('${item}', 'halfDay', this.value)"></td>
+          <td><input type="number" value="${prices.fullDay || ''}" onchange="updateEquipment('${item}', 'fullDay', this.value)"></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderBasicFees() {
+      document.getElementById('shipFee').value = adminPricing.shipFee;
+      document.getElementById('tagalong').value = adminPricing.tagalong;
+      document.getElementById('waterSkillReview').value = adminPricing.waterSkillReview;
+      document.getElementById('highOxygen').value = adminPricing.highOxygen;
+      document.getElementById('weightBeltInsurance').value = adminPricing.weightBeltInsurance;
+    }
+
+    function updateFunDive(people, type, value) {
+      adminPricing.funDive[people][type] = parseFloat(value) || 0;
+      savePricing(adminPricing);
+      showToast(`已更新 ${people}人 ${type} 價格`);
+    }
+
+    function updateEquipment(item, type, value) {
+      adminPricing.equipment[item][type] = value ? parseFloat(value) : null;
+      savePricing(adminPricing);
+      showToast(`已更新 ${item} ${type} 價格`);
+    }
+
+    function updateBasicFee(key, value) {
+      adminPricing[key] = parseFloat(value) || 0;
+      savePricing(adminPricing);
+      showToast(`已更新 ${key}`);
+    }
+
+    function resetToDefault() {
+      if (!confirm('確定要重置為預設值嗎？')) return;
+      resetPricing();
+      adminPricing = getPricing();
+      renderFunDiveTable();
+      renderEquipmentTable();
+      renderBasicFees();
+      showToast('已重置為預設值');
+    }
+
+    function exportPricing() {
+      const json = JSON.stringify(adminPricing, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        showToast('已複製 JSON 到剪貼簿');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    init();
+  </script>
+</body>
+</html>

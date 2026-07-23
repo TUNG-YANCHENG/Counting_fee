@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>潛水費用計算器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🤿 潛水費用計算器</h1>
+    <p class="subtitle">Fun Dive 與裝備租賃費用計算工具</p>
+
+    <!-- 人員選擇區 -->
+    <div class="section">
+      <div class="section-title">潛水人員</div>
+      <div id="diverSelector"></div>
+      <div id="diverList"></div>
+    </div>
+
+    <!-- 行程編輯區 -->
+    <div class="section">
+      <div class="section-title">行程規劃</div>
+      <div class="input-group">
+        <input type="text" id="dayInput" placeholder="例：9/25 (上午跳水、下午船潛x2)">
+        <button onclick="addDay()">新增一天</button>
+      </div>
+      <div id="daysList"></div>
+    </div>
+
+    <!-- 裝備設定區 -->
+    <div class="section">
+      <div class="section-title">裝備租賃設定</div>
+      <div id="equipmentSection"></div>
+    </div>
+
+    <!-- 費用明細 -->
+    <div class="section">
+      <div class="section-title">費用明細</div>
+      <div id="lineItems"></div>
+    </div>
+
+    <!-- 費用摘要 -->
+    <div class="section">
+      <div class="section-title">費用摘要</div>
+      <div id="summary"></div>
+      <div class="button-group">
+        <button class="copy-btn" onclick="copyQuote()">複製報價文本</button>
+        <button class="secondary" onclick="saveDraft()">儲存草稿</button>
+        <button class="admin-btn" onclick="window.location.href='admin.html'">⚙️ 後台管理</button>
+      </div>
+    </div>
+
+    <!-- 草稿管理 -->
+    <div class="section">
+      <div class="section-title">已儲存草稿</div>
+      <div id="storageSection"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

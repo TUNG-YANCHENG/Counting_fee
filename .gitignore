@@ -1,0 +1,29 @@
+# 環境設定
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 暫存檔案
+*.tmp
+*.temp
+*.log
+
+# 系統檔案
+Thumbs.db
+desktop.ini
+
+# 依賴
+node_modules/
+package-lock.json
+
+# 舊版本備份
+*_old.html
+*.backup

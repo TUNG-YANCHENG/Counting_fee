@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv index.html index_old.html)",
+      "Bash(mv index_new.html index.html)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m '初始化：潛水費用計算器 *)"
+    ]
+  }
+}
