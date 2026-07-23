@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台東行程計算器 - 民宿後台管理</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+
+    .admin-table thead {
+      background: var(--ocean);
+      color: white;
+    }
+
+    .admin-table th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border-light);
+    }
+
+    .admin-table td {
+      padding: 0.75rem;
+      border: 1px solid var(--border-light);
+    }
+
+    .admin-table input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border-light);
+      border-radius: 0.25rem;
+      font-family: var(--font-mono);
+    }
+
+    .admin-table tr:hover {
+      background: rgba(0, 102, 204, 0.05);
+    }
+
+    .table-section {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      border-left: 3px solid var(--ocean);
+      overflow-x: auto;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .table-section {
+        background: #111827;
+      }
+
+      .admin-table input {
+        background: #1F2937;
+        color: var(--text-primary);
+        border-color: #374151;
+      }
+    }
+
+    :root[data-theme="dark"] .table-section {
+      background: #111827;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .back-link {
+      color: var(--ocean);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      transition: background 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(0, 102, 204, 0.1);
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .price-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .price-input-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .price-input-group input {
+      padding: 0.5rem;
+      border: 1px solid var(--border-light);
+      border-radius: 0.25rem;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="admin-header">
+      <h1>🏠 民宿後台管理</h1>
+      <a class="back-link" href="index.html">← 返回計算器</a>
+    </div>
+
+    <!-- 房型定價 -->
+    <div class="table-section">
+      <h2 style="margin-bottom: 0.75rem; font-size: 1.1rem;">房型定價</h2>
+      <p class="section-subtitle">依房型 × 入住人數 × 平日/假日 (單位: 元/晚)</p>
+
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>房型</th>
+              <th colspan="2">2人</th>
+              <th colspan="2">3人</th>
+              <th colspan="2">4人</th>
+              <th colspan="2">5人</th>
+              <th colspan="2">6人</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>平日</th>
+              <th>假日</th>
+              <th>平日</th>
+              <th>假日</th>
+              <th>平日</th>
+              <th>假日</th>
+              <th>平日</th>
+              <th>假日</th>
+              <th>平日</th>
+              <th>假日</th>
+            </tr>
+          </thead>
+          <tbody id="roomPricingTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 加購行程定價 -->
+    <div class="table-section">
+      <h2 style="margin-bottom: 0.75rem; font-size: 1.1rem;">加購行程定價</h2>
+      <p class="section-subtitle">單位: 元/人</p>
+
+      <div id="packagePricingTable"></div>
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="table-section">
+      <div class="admin-actions">
+        <button class="copy-btn" onclick="exportAccommodation()">📊 匯出配置 JSON</button>
+        <button class="secondary" onclick="resetAccommodationToDefault()">🔄 重置為預設值</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="accommodation.js"></script>
+  <script>
+    let adminAccommodation = getAccommodation();
+
+    function init() {
+      renderRoomPricingTable();
+      renderPackagePricingTable();
+    }
+
+    function renderRoomPricingTable() {
+      const tbody = document.getElementById('roomPricingTable');
+      let html = '';
+
+      Object.entries(adminAccommodation.rooms).forEach(([roomId, room]) => {
+        html += `<tr><td><strong>${room.name}</strong></td>`;
+
+        for (let occupancy = 2; occupancy <= 6; occupancy++) {
+          const pricing = room.pricing[occupancy];
+          if (pricing) {
+            html += `
+              <td><input type="number" value="${pricing.weekday}"
+                onchange="updateRoomPrice('${roomId}', ${occupancy}, 'weekday', this.value)"></td>
+              <td><input type="number" value="${pricing.weekend}"
+                onchange="updateRoomPrice('${roomId}', ${occupancy}, 'weekend', this.value)"></td>
+            `;
+          } else {
+            html += `<td>-</td><td>-</td>`;
+          }
+        }
+
+        html += '</tr>';
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function renderPackagePricingTable() {
+      const container = document.getElementById('packagePricingTable');
+      let html = '';
+
+      Object.entries(adminAccommodation.packages).forEach(([pkgId, pkg]) => {
+        html += `
+          <div style="background: var(--sand); padding: 1rem; border-radius: 0.375rem; margin-bottom: 1rem; border-left: 2px solid var(--seafoam);">
+            <div style="font-weight: 600; margin-bottom: 0.75rem;">${pkg.name}</div>
+            <div class="price-grid">
+              <div class="price-input-group">
+                <label>定價</label>
+                <input type="number" value="${pkg.price}"
+                  onchange="updatePackagePrice('${pkgId}', 'price', this.value)">
+              </div>
+              <div class="price-input-group">
+                <label>機車差價</label>
+                <input type="number" value="${pkg.motorbikeExtraFee}"
+                  onchange="updatePackagePrice('${pkgId}', 'motorbikeExtraFee', this.value)">
+              </div>
+              <div class="price-input-group">
+                <label>天數</label>
+                <input type="number" value="${pkg.days}" disabled style="background: var(--border-light);">
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function updateRoomPrice(roomId, occupancy, type, value) {
+      adminAccommodation.rooms[roomId].pricing[occupancy][type] = parseInt(value) || 0;
+      saveAccommodation(adminAccommodation);
+      showToast(`已更新 ${adminAccommodation.rooms[roomId].name} ${occupancy}人 ${type === 'weekday' ? '平日' : '假日'} 價格`);
+    }
+
+    function updatePackagePrice(packageId, field, value) {
+      adminAccommodation.packages[packageId][field] = parseInt(value) || 0;
+      saveAccommodation(adminAccommodation);
+      showToast(`已更新 ${adminAccommodation.packages[packageId].name}`);
+    }
+
+    function resetAccommodationToDefault() {
+      if (!confirm('確定要重置為預設值嗎？')) return;
+      resetAccommodation();
+      adminAccommodation = getAccommodation();
+      init();
+      showToast('已重置為預設值');
+    }
+
+    function exportAccommodation() {
+      const json = JSON.stringify(adminAccommodation, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        showToast('已複製 JSON 到剪貼簿');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
