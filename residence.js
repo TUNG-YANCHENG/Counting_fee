@@ -37,7 +37,11 @@ function setCheckOutDate(dateStr) {
 
 function selectRoom(roomType) {
   residenceState.selectedRoom = roomType;
-  residenceState.selectedPackage = null;
+  renderResidenceCalculator();
+}
+
+function clearRoom() {
+  residenceState.selectedRoom = null;
   renderResidenceCalculator();
 }
 
@@ -50,7 +54,11 @@ function setOccupancy(count) {
 
 function selectPackage(packageId) {
   residenceState.selectedPackage = packageId;
-  residenceState.selectedRoom = null; // 選擇加購行程時清除房型選擇
+  renderResidenceCalculator();
+}
+
+function clearPackage() {
+  residenceState.selectedPackage = null;
   renderResidenceCalculator();
 }
 
@@ -296,10 +304,20 @@ function renderResidenceRoomOptions() {
       `;
     }).join('');
 
-  container.innerHTML = `
+  let html = `
     <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">房型選擇</h3>
     <div class="equipment-grid">${roomsHtml}</div>
   `;
+
+  if (residenceState.selectedRoom) {
+    html += `
+      <div style="margin-top: 1rem;">
+        <button class="danger" onclick="clearRoom()" style="width: 100%;">✕ 清除房型選擇</button>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
 }
 
 function renderResidencePackageOptions() {
@@ -325,10 +343,20 @@ function renderResidencePackageOptions() {
     `;
   }).join('');
 
-  container.innerHTML = `
+  let html = `
     <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--slate);">加購行程</h3>
     <div class="equipment-grid">${packagesHtml}</div>
   `;
+
+  if (residenceState.selectedPackage) {
+    html += `
+      <div style="margin-top: 1rem;">
+        <button class="danger" onclick="clearPackage()" style="width: 100%;">✕ 清除加購選擇</button>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
 }
 
 function renderResidenceLineItems() {
@@ -350,14 +378,23 @@ function renderResidenceLineItems() {
     html += `<div style="margin-bottom: 1.5rem;">
       <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--slate);">${category}</h3>`;
 
-    categoryItems.forEach(item => {
+    categoryItems.forEach((item, idx) => {
+      let deleteBtn = '';
+      if (item.isCustom) {
+        const customIdx = parseInt(item.id.split('-')[1]);
+        deleteBtn = `<button class="danger" onclick="residenceState.customItems.splice(${customIdx}, 1); renderResidenceCalculator();" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;">✕ 刪除</button>`;
+      }
+
       html += `
-        <div class="line-item">
-          <div class="item-description">
-            <div class="item-label">${item.label}</div>
-            ${item.calc ? `<div class="item-calc">${item.calc}</div>` : ''}
+        <div class="line-item" style="display: flex; justify-content: space-between; align-items: start; padding: 0.875rem 0; border-bottom: 1px solid var(--border-light);">
+          <div class="item-description" style="flex: 1; min-width: 0;">
+            <div class="item-label" style="font-weight: 500; color: var(--text-primary); word-break: break-word;">${item.label}</div>
+            ${item.calc ? `<div class="item-calc" style="font-size: 0.85rem; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 0.25rem; word-break: break-word;">${item.calc}</div>` : ''}
           </div>
-          <div class="item-price">${item.price}</div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-left: 1rem;">
+            <div class="item-price" style="text-align: right; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; min-width: 90px;">$${item.price}</div>
+            ${deleteBtn}
+          </div>
         </div>
       `;
     });
