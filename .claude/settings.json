@@ -3,7 +3,8 @@
     "allow": [
       "Bash(sed -i 's/saveComboD.aft/saveComboDraft/g' combo.js)",
       "Bash(sed -i 's/loadComboD.aft/loadComboDraft/g' combo.js)",
-      "Bash(sed -i 's/deleteComboD.aft/deleteComboDraft/g' combo.js)"
+      "Bash(sed -i 's/deleteComboD.aft/deleteComboDraft/g' combo.js)",
+      "Bash(git checkout *)"
     ]
   }
 }
