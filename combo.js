@@ -734,7 +734,7 @@ function renderComboSummary() {
     </div>
     <div class="button-group" style="margin-top: 1.5rem;">
       <button class="copy-btn" onclick="copyComboQuote()">複製報價文本</button>
-      <button class="secondary" onclick="saveComboD​raft()">儲存草稿</button>
+      <button class="secondary" onclick="saveComboDraft()">儲存草稿</button>
     </div>
 
     <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid var(--border-light);">
@@ -759,8 +759,8 @@ function renderComboSummary() {
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--sand); border-radius: 0.375rem; margin-bottom: 0.5rem;">
               <span style="font-weight: 500;">${name}</span>
               <div style="display: flex; gap: 0.5rem;">
-                <button class="secondary" onclick="loadComboD​raft('${name.replace(/'/g, "\\'")}'" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">載入</button>
-                <button class="danger" onclick="deleteComboD​raft('${name.replace(/'/g, "\\'")}'" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">刪除</button>
+                <button class="secondary" onclick="loadComboDraft('${name.replace(/'/g, "\\'")}'" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">載入</button>
+                <button class="danger" onclick="deleteComboDraft('${name.replace(/'/g, "\\'")}'" style="padding: 0.25rem 0.75rem; font-size: 0.9rem;">刪除</button>
               </div>
             </div>
           `;
@@ -851,12 +851,11 @@ function copyComboQuote() {
   });
 }
 
-function saveComboD​raft() {
+function saveComboDraft() {
   const name = prompt('輸入草稿名稱:');
   if (!name) return;
 
   try {
-    // 序列化state，將Set轉換為Array
     const serialized = JSON.stringify(comboState, (key, value) => {
       if (value instanceof Set) {
         return Array.from(value);
@@ -864,7 +863,6 @@ function saveComboD​raft() {
       return value;
     });
 
-    // 保存到localStorage
     const drafts = JSON.parse(localStorage.getItem('comboDrafts') || '{}');
     drafts[name] = serialized;
     localStorage.setItem('comboDrafts', JSON.stringify(drafts));
@@ -875,12 +873,11 @@ function saveComboD​raft() {
   }
 }
 
-function loadComboD​raft(name) {
+function loadComboDraft(name) {
   try {
     const drafts = JSON.parse(localStorage.getItem('comboDrafts') || '{}');
     const saved = JSON.parse(drafts[name]);
 
-    // 恢復state，將Array轉換回Set
     saved.days = saved.days.map(day => ({
       ...day,
       activities: day.activities.map(act => ({
@@ -898,7 +895,7 @@ function loadComboD​raft(name) {
   }
 }
 
-function deleteComboD​raft(name) {
+function deleteComboDraft(name) {
   if (!confirm(`確定要刪除草稿 "${name}" 嗎?`)) return;
 
   try {
@@ -906,7 +903,7 @@ function deleteComboD​raft(name) {
     delete drafts[name];
     localStorage.setItem('comboDrafts', JSON.stringify(drafts));
     showToast(`草稿 "${name}" 已刪除`);
-    renderComboSummary(); // 重新渲染摘要區域
+    renderComboCalculator();
   } catch (e) {
     showToast(`刪除失敗: ${e.message}`);
   }
