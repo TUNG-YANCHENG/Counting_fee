@@ -27,7 +27,7 @@ function comboGetDivingCost() {
 
   const items = generateLineItems();
   const subtotal = items.reduce((sum, item) => {
-    return sum + (item.overridePrice !== null ? item.overridePrice : item.price);
+    return sum + (item.override !== null ? item.override : item.price);
   }, 0);
 
   return Math.max(0, subtotal - (state.globalDiscount || 0));
