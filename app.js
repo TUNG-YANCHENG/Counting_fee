@@ -179,8 +179,18 @@ function calculateActivityCost(dayId, activity) {
   const participantCount = activity.participants.size;
   if (participantCount === 0) return 0;
 
+  if (!PRICING || !PRICING.funDive) {
+    console.error('价目表未初始化:', { PRICING });
+    return 0;
+  }
+
   const peopleKey = Math.min(participantCount, 8);
   const pricing = PRICING.funDive[peopleKey];
+
+  if (!pricing) {
+    console.error(`找不到 ${peopleKey} 人的价格表`, { PRICING });
+    return 0;
+  }
 
   let cost = 0;
   if (activity.type && pricing[activity.type]) {
