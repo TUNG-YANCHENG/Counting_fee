@@ -210,6 +210,11 @@
       // 設定按鈕為活躍
       event.target.classList.add('active');
 
+      // 如果是潛水模式，初始化潛水計算器
+      if (tabName === 'diving') {
+        render();
+      }
+
       // 如果是民宿模式，初始化民宿計算器
       if (tabName === 'residence') {
         initResidence();
